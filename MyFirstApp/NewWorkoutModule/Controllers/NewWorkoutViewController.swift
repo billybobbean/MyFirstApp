@@ -60,6 +60,8 @@ class NewWorkoutViewController: UIViewController {
         saveModel()
     }
     
+    //MARK: - Model
+    
     private func setModel() {
         workoutModel.workoutName = nameView.getNameTextFieldText()
         
