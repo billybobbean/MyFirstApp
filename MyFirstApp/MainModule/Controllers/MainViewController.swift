@@ -85,6 +85,8 @@ extension MainViewController: CalendarViewProtocol {
     
     
 }
+
+//MARK: - Extensions
     
 extension MainViewController {
     private func setConstrains() {
