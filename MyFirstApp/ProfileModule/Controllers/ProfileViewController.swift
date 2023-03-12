@@ -63,6 +63,8 @@ class ProfileViewController: UIViewController {
     
 }
 
+//MARK: - Extensions
+
 extension ProfileViewController {
     private func setConstraints() {
         NSLayoutConstraint.activate([
