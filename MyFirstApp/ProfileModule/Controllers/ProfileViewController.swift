@@ -9,6 +9,8 @@ import UIKit
 
 class ProfileViewController: UIViewController {
     
+    //MARK: - New Mark
+    
     private let profileLabel = UILabel(text: "PROFILE", font: .robotoMedium24(), textColor: .specialGray)
     
     private let userPhotoImageView = UserPhotoImage(frame: CGRect.init(x: 0, y: 0, width: 0, height: 0))
