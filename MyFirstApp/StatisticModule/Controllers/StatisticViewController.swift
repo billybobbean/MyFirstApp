@@ -32,8 +32,18 @@ class StatisticViewController: UIViewController {
         return segmentedControl
     }()
     
-    private let exercisesLabel = UILabel(text: "Exercises")
     private let tableView = StatisticsTableView()
+    private let exercisesLabel = UILabel(text: "Exercises")
+    
+    
+    private var workoutArray = [WorkoutModel]()
+    private var differenceArray = [DifferenceWorkout]()
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        setStartScreen()
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,11 +62,54 @@ class StatisticViewController: UIViewController {
     }
     
     @objc private func segmentedChange() {
+        
+        let dateToday = Date()
+        differenceArray = [DifferenceWorkout]()
+        
         if segmentedControl.selectedSegmentIndex == 0 {
-            print("Week")
+            let dateStart = dateToday.offsetDay(day: 7)
+            getDifferenceModel(dateStart: dateStart)
         } else {
-            print("Month")
+            let dateStart = dateToday.offsetMonth(month: 1)
+            getDifferenceModel(dateStart: dateStart)
         }
+        tableView.reloadData()
+    }
+    
+    private func getWorkoutsName() -> [String] {
+        var nameArray = [String]()
+        let allWorkouts = RealmManager.shared.getResultWorkoutModel()
+        for workoutModel in allWorkouts {
+            if !nameArray.contains(workoutModel.workoutName) {
+                nameArray.append(workoutModel.workoutName)
+            }
+        }
+        
+        return nameArray
+    }
+    
+    private func getDifferenceModel(dateStart: Date) {
+        let dateEnd = Date()
+        let nameArray = getWorkoutsName()
+        let allWorkouts = RealmManager.shared.getResultWorkoutModel()
+        
+        for name in nameArray {
+            let predicateDifference = NSPredicate(format: "workoutName = '\(name)' AND workoutDate BETWEEN %@", [dateStart, dateEnd])
+            let filteredArray = allWorkouts.filter(predicateDifference).sorted(byKeyPath: "workoutDate")
+            workoutArray = filteredArray.map { $0 }
+            
+            guard let last = workoutArray.last?.workoutReps, let first = workoutArray.first?.workoutReps else { return }
+            let differenceWorkout = DifferenceWorkout(name: name, lastReps: last, firstReps: first)
+            differenceArray.append(differenceWorkout)
+        }
+        tableView.setDifferenceArray(array: differenceArray)
+    }
+    
+    private func setStartScreen() {
+        let dateToday = Date()
+        differenceArray = [DifferenceWorkout]()
+        getDifferenceModel(dateStart: dateToday.offsetDay(day: 7))
+        tableView.reloadData()
     }
     
 }
