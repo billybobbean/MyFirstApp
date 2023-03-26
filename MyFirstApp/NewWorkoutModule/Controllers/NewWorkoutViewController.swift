@@ -81,7 +81,9 @@ class NewWorkoutViewController: UIViewController {
         let text = nameView.getNameTextFieldText()
         let count = text.filter { $0.isNumber || $0.isLetter }.count
         
-        if count != 0 && (workoutModel.workoutSets != 0 || workoutModel.workoutTimer != 0) {
+        if count != 0 &&
+            workoutModel.workoutSets != 0 &&
+            (workoutModel.workoutSets != 0 || workoutModel.workoutTimer != 0) {
             RealmManager.shared.saveWorkoutModel(workoutModel)
             presentSimpleAlert(title: "Succes", message: nil)
             workoutModel = WorkoutModel()

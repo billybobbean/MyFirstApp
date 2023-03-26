@@ -7,17 +7,18 @@
 
 import UIKit
 
-class StatisticsTableView: UITableView {
+class StatisticTableView: UITableView {
+    
+    private let idStatisticTableViewCell = "idStatisticTableViewCell"
     
     private var differenceArray = [DifferenceWorkout]()
-    
+ 
     override init(frame: CGRect, style: UITableView.Style) {
         super.init(frame: frame, style: style)
         
         configure()
         setDelegates()
-        
-        register(StatisticTableViewCell.self, forCellReuseIdentifier: StatisticTableViewCell.idTableViewCell )
+        register(StatisticTableViewCell.self, forCellReuseIdentifier: idStatisticTableViewCell)
     }
     
     required init?(coder: NSCoder) {
@@ -40,18 +41,19 @@ class StatisticsTableView: UITableView {
     public func setDifferenceArray(array: [DifferenceWorkout]) {
         differenceArray = array
     }
-    
 }
 
-//MARK: - UITableViewDataSource
+// MARK: - UITableViewDataSource
 
-extension StatisticsTableView: UITableViewDataSource {
+extension StatisticTableView: UITableViewDataSource {
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         differenceArray.count
     }
-    
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: StatisticTableViewCell.idTableViewCell, for: indexPath) as? StatisticTableViewCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: idStatisticTableViewCell,
+                                                       for: indexPath) as? StatisticTableViewCell else {
             return UITableViewCell()
         }
         let model = differenceArray[indexPath.row]
@@ -62,8 +64,10 @@ extension StatisticsTableView: UITableViewDataSource {
 
 //MARK: - UITableViewDelegate
 
-extension StatisticsTableView: UITableViewDelegate {
+extension StatisticTableView: UITableViewDelegate {
+
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         55
     }
 }
+

@@ -13,16 +13,14 @@ protocol MainTableViewProtocol: AnyObject {
 
 class MainTableView: UITableView {
     
-    weak var mainDelegate: MainTableViewProtocol?
+    weak var mainDelegate: MainTableViewProtocol? //MainViewController
     
     private var workoutArray = [WorkoutModel]()
     
     override init(frame: CGRect, style: UITableView.Style) {
         super.init(frame: frame, style: style)
-        
         configure()
         setDelegates()
-        
         register(WorkoutTableViewCell.self, forCellReuseIdentifier: WorkoutTableViewCell.idTableViewCell)
     }
     
@@ -43,7 +41,7 @@ class MainTableView: UITableView {
         dataSource = self
     }
     
-    public func setWorkoyArray(array: [WorkoutModel]) {
+    public func setWorkoutArray(array: [WorkoutModel]) {
         workoutArray = array
     }
 }
@@ -56,14 +54,13 @@ extension MainTableView: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: WorkoutTableViewCell.idTableViewCell, for: indexPath) as? WorkoutTableViewCell else {
-            return UITableViewCell()
-        }
-        // dequeueReusableCell - создает ячейку
-        
+       guard let cell = tableView.dequeueReusableCell(withIdentifier: WorkoutTableViewCell.idTableViewCell,
+                                                      for: indexPath) as? WorkoutTableViewCell else {
+           return UITableViewCell()
+       }
         let workoutModel = workoutArray[indexPath.row]
         cell.configure(model: workoutModel)
-        cell.workOutCellDelegate = mainDelegate as? WorkoutCellProtocol
+        cell.workoutCellDelegate = mainDelegate as? WorkoutCellProtocol
         return cell
     }
 }
@@ -71,9 +68,8 @@ extension MainTableView: UITableViewDataSource {
 //MARK: - UITableViewDelegate
 
 extension MainTableView: UITableViewDelegate {
-    // Устанавливаем высоту ячейки
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        105
+        100
     }
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
@@ -90,3 +86,4 @@ extension MainTableView: UITableViewDelegate {
         return UISwipeActionsConfiguration(actions: [action])
     }
 }
+ 

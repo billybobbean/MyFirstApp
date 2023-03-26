@@ -9,46 +9,37 @@ import UIKit
 
 class StatisticTableViewCell: UITableViewCell {
     
-    static let idTableViewCell = "idTableViewCell"
-    
-    private let backgroundCell: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
+    let differenceLabel: UILabel = {
+        let label = UILabel()
+        label.text = "+2"
+        label.font = .robotoMedium24()
+        label.textColor = .specialGreen
+        label.textAlignment = .right
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
     }()
     
     private let nameLabel: UILabel = {
         let label = UILabel()
         label.text = "Biceps"
-        label.textColor = .specialGray
         label.font = .robotoMedium24()
+        label.textColor = .specialGray
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     private let beforeLabel = UILabel(text: "Before: 18")
-    
     private let nowLabel = UILabel(text: "Now: 20")
     
-    private let differenceLabel: UILabel = {
-        let label = UILabel()
-        label.text = "+2"
-        label.textAlignment = .right
-        label.textColor = .specialGreen
-        label.font = .robotoBold24()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
+    private var stackView = UIStackView()
     
     private let lineView: UIView = {
-        let view = UIView()
+       let view = UIView()
         view.backgroundColor = .specialLine
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-    
-    private var stackView = UIStackView()
-    
+
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
@@ -64,15 +55,12 @@ class StatisticTableViewCell: UITableViewCell {
         backgroundColor = .clear
         selectionStyle = .none
         
-        addSubview(backgroundCell)
-        addSubview(nameLabel)
         addSubview(differenceLabel)
+        addSubview(nameLabel)
         
-        stackView = UIStackView(
-            arrangedSubviews: [beforeLabel, nowLabel],
-            axis: .horizontal,
-            spacing: 10)
-        
+        stackView = UIStackView(arrangedSubviews: [beforeLabel, nowLabel],
+                                axis: .horizontal,
+                                spacing: 10)
         addSubview(stackView)
         addSubview(lineView)
     }
@@ -95,6 +83,7 @@ class StatisticTableViewCell: UITableViewCell {
 }
 
 extension StatisticTableViewCell {
+    
     private func setConstraints() {
         NSLayoutConstraint.activate([
             differenceLabel.centerYAnchor.constraint(equalTo: centerYAnchor),

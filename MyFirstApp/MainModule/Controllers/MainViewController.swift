@@ -9,15 +9,22 @@ import UIKit
 
 class MainViewController: UIViewController {
     
-    private let userPhotoImageView = UserPhotoImage(frame: CGRect.init(x: 0, y: 0, width: 0, height: 0))
+    private let userPhotoImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.backgroundColor = #colorLiteral(red: 0.8044065833, green: 0.8044064641, blue: 0.8044064641, alpha: 1)
+        imageView.layer.borderColor = UIColor.white.cgColor
+        imageView.layer.borderWidth = 5
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
     
     private let userNameLabel: UILabel = {
-        let label = UILabel()
+       let label = UILabel()
         label.text = "Your name"
-        label.textColor = .specialGray
-        label.font = .robotoMedium24()
         label.adjustsFontSizeToFitWidth = true
         label.minimumScaleFactor = 0.5
+        label.font = .robotoMedium24()
+        label.textColor = .specialGray
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -28,9 +35,15 @@ class MainViewController: UIViewController {
         button.layer.cornerRadius = 10
         button.setTitle("Add workout", for: .normal)
         button.tintColor = .specialDarkGreen
-        button.imageEdgeInsets = .init(top: 0, left: 20, bottom: 15, right: 0)
-        button.titleEdgeInsets = .init(top: 50, left: -40, bottom: 0, right: 0)
         button.titleLabel?.font = .robotoMedium12()
+        button.imageEdgeInsets = .init(top: 0,
+                                       left: 20,
+                                       bottom: 15,
+                                       right: 0)
+        button.titleEdgeInsets = .init(top: 50,
+                                       left: -40,
+                                       bottom: 0,
+                                       right: 0)
         button.setImage(UIImage(named: "plus"), for: .normal)
         button.addShadowOnView()
         button.addTarget(self, action: #selector(addWorkoutButtonTapped), for: .touchUpInside)
@@ -39,7 +52,7 @@ class MainViewController: UIViewController {
     }()
     
     private let noWorkoutImageView: UIImageView = {
-        let imageView = UIImageView()
+       let imageView = UIImageView()
         imageView.image = UIImage(named: "noWorkout")
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -51,9 +64,9 @@ class MainViewController: UIViewController {
     private let workoutTodayLabel = UILabel(text: "Workout today")
     private let tableView = MainTableView()
     
-    private var workoutArray = [WorkoutModel]() // массив который хранит модели
-    
-    override func viewDidLayoutSubviews() {
+    private var workoutArray = [WorkoutModel]()
+
+    override func viewDidLayoutSubviews() { //перерисовка объектов и определение границ
         userPhotoImageView.layer.cornerRadius = userPhotoImageView.frame.width / 2
     }
     
@@ -62,16 +75,15 @@ class MainViewController: UIViewController {
         
         selectItem(date: Date())
     }
-    
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+ 
         setupViews()
-        setConstrains()
+        setConstraints()
     }
     
-    private func setupViews() {
+    private func setupViews() { //настройка пользовательских объектов
         view.backgroundColor = .specialBackground
         
         view.addSubview(calendarView)
@@ -92,75 +104,73 @@ class MainViewController: UIViewController {
         present(newWorkoutViewController, animated: true)
     }
     
-    // метод, который сортирует записи и сохраняет их в дальнейшем
     private func getWorkouts(date: Date) {
-        let weekday = date.getWeekdayNumber() // получаем номер дня недели
+        let weekday = date.getWeekdayNumber()
         let dateStart = date.startEndDate().start
         let dateEnd = date.startEndDate().end
         
-        // Используем предикаты для сортировки условий
         let predicateRepeat = NSPredicate(format: "workoutNumberOfDay = \(weekday) AND workoutRepeat = true")
         let predicateUnrepeat = NSPredicate(format: "workoutRepeat = false AND workoutDate BETWEEN %@", [dateStart, dateEnd])
         let compound = NSCompoundPredicate(type: .or, subpredicates: [predicateRepeat, predicateUnrepeat])
-        
+
         let resultArray = RealmManager.shared.getResultWorkoutModel()
-        let filteredArray = resultArray.filter(compound).sorted(byKeyPath: "workoutName")
-        workoutArray = filteredArray.map { $0 }
+        let filtredArray = resultArray.filter(compound).sorted(byKeyPath: "workoutName")
+        workoutArray = filtredArray.map { $0 }
     }
     
     private func checkWorkoutToday() {
-        if workoutArray.count == 0 {
-            noWorkoutImageView.isHidden = false
-            tableView.isHidden = true
-        } else {
-            noWorkoutImageView.isHidden = true
-            tableView.isHidden = false
-        }
+        noWorkoutImageView.isHidden = !workoutArray.isEmpty
+        tableView.isHidden = workoutArray.isEmpty
     }
 }
 
-//MARK: - CalendarViewProtocol
+//MARK: CalendarViewProtocol
 
 extension MainViewController: CalendarViewProtocol {
     func selectItem(date: Date) {
         getWorkouts(date: date)
-        tableView.setWorkoyArray(array: workoutArray)
+        tableView.setWorkoutArray(array: workoutArray)
         tableView.reloadData()
         checkWorkoutToday()
     }
-    
 }
+
+//MARK: - MainTableViewProtocol
 
 extension MainViewController: MainTableViewProtocol {
     func deleteWorkout(model: WorkoutModel, index: Int) {
         RealmManager.shared.deleteWorkoutModel(model)
         workoutArray.remove(at: index)
-        tableView.setWorkoyArray(array: workoutArray)
+        tableView.setWorkoutArray(array: workoutArray)
         tableView.reloadData()
     }
 }
 
+//MARK: - WorkoutCellProtocol
+
 extension MainViewController: WorkoutCellProtocol {
     func startButtonTapped(model: WorkoutModel) {
         if model.workoutTimer == 0 {
-            let startWorkoutViewController = StartWorkoutViewController()
-            startWorkoutViewController.modalPresentationStyle = .fullScreen
-            present(startWorkoutViewController, animated: true)
+            let repsWorkoutViewController = RepsWorkoutViewController()
+            repsWorkoutViewController.modalPresentationStyle = .fullScreen
+            repsWorkoutViewController.setWorkoutModel(model)
+            present(repsWorkoutViewController, animated: true)
         } else {
-            print("timer")
+            let timerWorkoutViewController = TimerWorkoutViewController()
+            timerWorkoutViewController.modalPresentationStyle = .fullScreen
+            timerWorkoutViewController.setWorkoutModel(model)
+            present(timerWorkoutViewController, animated: true)
         }
     }
 }
 
-//MARK: - Constraints
-    
 extension MainViewController {
-    private func setConstrains() {
+    private func setConstraints() {
         NSLayoutConstraint.activate([
             userPhotoImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
             userPhotoImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
-            userPhotoImageView.heightAnchor.constraint(equalToConstant: 100),
             userPhotoImageView.widthAnchor.constraint(equalToConstant: 100),
+            userPhotoImageView.heightAnchor.constraint(equalToConstant: 100),
             
             calendarView.topAnchor.constraint(equalTo: userPhotoImageView.centerYAnchor),
             calendarView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
@@ -173,8 +183,8 @@ extension MainViewController {
             
             addWorkoutButton.topAnchor.constraint(equalTo: calendarView.bottomAnchor, constant: 5),
             addWorkoutButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
-            addWorkoutButton.widthAnchor.constraint(equalToConstant: 80),
             addWorkoutButton.heightAnchor.constraint(equalToConstant: 80),
+            addWorkoutButton.widthAnchor.constraint(equalToConstant: 80),
             
             weatherView.topAnchor.constraint(equalTo: calendarView.bottomAnchor, constant: 5),
             weatherView.leadingAnchor.constraint(equalTo: addWorkoutButton.trailingAnchor, constant: 10),

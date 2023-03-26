@@ -13,10 +13,10 @@ protocol WorkoutCellProtocol: AnyObject {
 
 class WorkoutTableViewCell: UITableViewCell {
     
-    weak var workOutCellDelegate: WorkoutCellProtocol?
+    weak var workoutCellDelegate: WorkoutCellProtocol?
     
     static let idTableViewCell = "idTableViewCell"
-    
+
     private let backgroundCell: UIView = {
         let view = UIView()
         view.layer.cornerRadius = 20
@@ -43,7 +43,7 @@ class WorkoutTableViewCell: UITableViewCell {
     }()
     
     private let workoutNameLabel: UILabel = {
-        let label = UILabel()
+       let label = UILabel()
         label.text = "Pull Ups"
         label.textColor = .specialBlack
         label.font = .robotoMedium22()
@@ -52,7 +52,7 @@ class WorkoutTableViewCell: UITableViewCell {
     }()
     
     private let workoutRepsLabel: UILabel = {
-        let label = UILabel()
+       let label = UILabel()
         label.text = "Reps: 10"
         label.textColor = .specialGray
         label.font = .robotoMedium16()
@@ -61,7 +61,7 @@ class WorkoutTableViewCell: UITableViewCell {
     }()
     
     private let workoutSetsLabel: UILabel = {
-        let label = UILabel()
+       let label = UILabel()
         label.text = "Sets: 2"
         label.textColor = .specialGray
         label.font = .robotoMedium16()
@@ -73,12 +73,15 @@ class WorkoutTableViewCell: UITableViewCell {
         let button = UIButton(type: .system)
         button.layer.cornerRadius = 10
         button.addShadowOnView()
+//        button.backgroundColor = .specialYellow
         button.titleLabel?.font = .robotoBold16()
+//        button.setTitle("START", for: .normal)
+//        button.tintColor = .specialDarkGreen
         button.addTarget(self, action: #selector(startButtonTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
-    
+
     private var labelsStackView = UIStackView()
     
     private var workoutModel = WorkoutModel()
@@ -87,7 +90,7 @@ class WorkoutTableViewCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
         setupViews()
-        setConstrains()
+        setConstraints()
     }
     
     required init?(coder: NSCoder) {
@@ -95,30 +98,27 @@ class WorkoutTableViewCell: UITableViewCell {
     }
     
     private func setupViews() {
-        
         backgroundColor = .clear
         selectionStyle = .none
+        
         addSubview(backgroundCell)
         addSubview(workoutBackgroundView)
         workoutBackgroundView.addSubview(workoutImageView)
         addSubview(workoutNameLabel)
         
-        labelsStackView = UIStackView(
-            arrangedSubviews: [workoutRepsLabel, workoutSetsLabel],
-            axis: .horizontal,
-            spacing: 10)
-        
+        labelsStackView = UIStackView(arrangedSubviews: [workoutRepsLabel,
+                                                        workoutSetsLabel],
+                                      axis: .horizontal,
+                                      spacing: 10)
         addSubview(labelsStackView)
-        
-        addSubview(startButton)
+        contentView.addSubview(startButton)
     }
     
     @objc private func startButtonTapped() {
-        workOutCellDelegate?.startButtonTapped(model: workoutModel)
+        workoutCellDelegate?.startButtonTapped(model: workoutModel)
     }
     
     public func configure(model: WorkoutModel) {
-        
         workoutModel = model
         
         workoutNameLabel.text = model.workoutName
@@ -130,7 +130,7 @@ class WorkoutTableViewCell: UITableViewCell {
         }
         
         workoutSetsLabel.text = "Sets: \(model.workoutSets)"
-        
+
         if model.workoutStatus {
             startButton.setTitle("COMPLETE", for: .normal)
             startButton.tintColor = .white
@@ -143,14 +143,15 @@ class WorkoutTableViewCell: UITableViewCell {
             startButton.isEnabled = true
         }
         
-        guard let imageData = model.workoutImage, let image = UIImage(data: imageData) else { return }
+        guard let imageData = model.workoutImage,
+              let image = UIImage(data: imageData) else { return }
         workoutImageView.image = image.withRenderingMode(.alwaysTemplate)
     }
 }
 
 extension WorkoutTableViewCell {
     
-    private func setConstrains() {
+    private func setConstraints() {
         NSLayoutConstraint.activate([
             backgroundCell.topAnchor.constraint(equalTo: topAnchor, constant: 5),
             backgroundCell.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
@@ -167,8 +168,8 @@ extension WorkoutTableViewCell {
             workoutImageView.trailingAnchor.constraint(equalTo: workoutBackgroundView.trailingAnchor, constant: -10),
             workoutImageView.bottomAnchor.constraint(equalTo: workoutBackgroundView.bottomAnchor, constant: -10),
             
+            workoutNameLabel.topAnchor.constraint(equalTo: backgroundCell.topAnchor, constant: 5),
             workoutNameLabel.leadingAnchor.constraint(equalTo: workoutBackgroundView.trailingAnchor, constant: 10),
-            workoutNameLabel.topAnchor.constraint(equalTo: backgroundCell.topAnchor, constant: 10),
             workoutNameLabel.trailingAnchor.constraint(equalTo: backgroundCell.trailingAnchor, constant: -10),
             
             labelsStackView.topAnchor.constraint(equalTo: workoutNameLabel.bottomAnchor, constant: 0),
